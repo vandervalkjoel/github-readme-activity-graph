@@ -27,6 +27,8 @@ export class QueryOption {
     radius: number;
     height: number;
     days: number;
+    /** Rolling-average window in days. 1 means no smoothing. */
+    smooth: number;
 }
 
 export class ParsedQs {
@@ -49,6 +51,7 @@ export class ParsedQs {
     from?: string;
     to?: string;
     grid?: string;
+    smooth?: string;
 }
 
 export class GraphArgs {

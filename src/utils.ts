@@ -3,7 +3,7 @@ import { Response } from 'express';
 import { Card } from './GraphCards';
 import { invalidUserSvg } from './svgs';
 import { selectColors } from './styles/themes';
-import { QueryOption, ParsedQs, UserDetails } from './interfaces/interface';
+import { QueryOption, ParsedQs, UserDetails, ContributionDay } from './interfaces/interface';
 
 export class Utilities {
     public username: string;
@@ -49,6 +49,48 @@ export class Utilities {
         } else {
             return 31;
         }
+    }
+
+    /**
+     * Rolling-average window, in days. 1 disables smoothing, which is the
+     * default so behaviour matches upstream unless asked for.
+     */
+    private validateSmooth(smooth?: string): number {
+        const s = Number(smooth);
+        if (!Number.isFinite(s) || s < 1) {
+            return 1;
+        }
+        return Math.min(Math.floor(s), 30);
+    }
+
+    /**
+     * Replace each day's count with a trailing average over `window` days.
+     *
+     * Daily contribution counts swing wildly (0 to 98 in this account's data),
+     * which renders as a picket fence that hides the actual trend. A trailing
+     * average keeps the shape honest while making it legible.
+     *
+     * The first `window - 1` points average over fewer days, since there is no
+     * data before the range starts. That understates the left edge slightly
+     * rather than inventing values for it.
+     */
+    private static rollingAverage(
+        days: Array<ContributionDay>,
+        window: number,
+    ): Array<ContributionDay> {
+        if (window <= 1) {
+            return days;
+        }
+        return days.map((day, i) => {
+            const start = Math.max(0, i - window + 1);
+            const slice = days.slice(start, i + 1);
+            const mean =
+                slice.reduce((sum, d) => sum + d.contributionCount, 0) / slice.length;
+            return {
+                date: day.date,
+                contributionCount: Math.round(mean * 10) / 10,
+            };
+        });
     }
 
     private validateDate(date?: string): boolean {
@@ -121,6 +163,7 @@ export class Utilities {
                 : 420, // Custom height implementation from range [200, 600], if not specified use default value - 420
             days: isFromValid && isToValid ? days : this.validateDays(this.queryString.days),
             grid: this.queryString.grid === 'false' ? false : true,
+            smooth: this.validateSmooth(this.queryString.smooth),
             from,
             to,
         };
@@ -155,7 +198,9 @@ export class Utilities {
                 options.area,
                 options.grid,
             );
-            const getChart = await graph.buildGraph(fetchCalendarData.contributions);
+            const getChart = await graph.buildGraph(
+                Utilities.rollingAverage(fetchCalendarData.contributions, options.smooth),
+            );
             return {
                 finalGraph: getChart,
                 header: {
