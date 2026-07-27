@@ -107,6 +107,21 @@ Customize the appearance of your Activity Graph however you want with URL params
 |      `to`      |         date where the graph will end         |              format `YYYY-MM-DD`               |
 |     `grid`     |                   show grid                   |           boolean (default: `true`)            |
 
+#### Options added in this fork
+
+Not available on the upstream deployment.
+
+|   Arguments    |                                Description                                |           Type of Value            |
+| :------------: | :-----------------------------------------------------------------------: | :--------------------------------: |
+|    `months`    |          calendar months back from today, instead of `days`               |     number (1-12 inclusive)        |
+|    `smooth`    |     plot a trailing average over N days instead of the raw daily count     |  number (1-30, default: `1` = off) |
+| `hide_points`  |                   drop the dot drawn on every data point                   |    boolean (default: `false`)      |
+|    `x_axis`    |       `month` labels the axis by month name instead of day of month        |               string               |
+|    `daily`     | draw the raw daily counts as bars behind the line (needs `smooth` above 1) |    boolean (default: `false`)      |
+| `daily_color`  |                  color of those bars, defaults to `line`                   |     hex code (without `#`)         |
+
+`days` also accepts up to 366 here, where upstream caps it at 90.
+
 ⚠ **For `custom_title` please make sure that you are using %20 for spaces**
 
 Example:

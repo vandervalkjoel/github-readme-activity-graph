@@ -13,6 +13,8 @@ export class Colors {
     titleColor: string;
     lineColor: string;
     pointColor: string;
+    /** Optional so the theme table stays as upstream wrote it; falls back to the line color. */
+    dailyColor?: string;
 }
 
 export class QueryOption {
@@ -33,6 +35,8 @@ export class QueryOption {
     show_point: boolean;
     /** Label the x axis by month instead of by day. */
     month_labels: boolean;
+    /** Draw the unsmoothed daily counts as bars behind the line. */
+    daily: boolean;
 }
 
 export class ParsedQs {
@@ -59,6 +63,8 @@ export class ParsedQs {
     hide_points?: string;
     x_axis?: string;
     months?: string;
+    daily?: string;
+    daily_color?: string;
 }
 
 export class GraphArgs {
@@ -68,6 +74,8 @@ export class GraphArgs {
     title: string;
     radius: number;
     line: Promise<string>;
+    /** Key for the two marks, drawn only when the daily bars are on. */
+    legend?: string;
 }
 
 export class UserDetails {

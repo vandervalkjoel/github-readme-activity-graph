@@ -34,6 +34,7 @@ export const graphSvg = (props: GraphArgs) => `
                     props.colors.lineColor,
                     props.colors.pointColor,
                     props.colors.areaColor,
+                    props.colors.dailyColor,
                 )}
                 ${pointAnimation()}
                 ${lineAnimation()}
@@ -45,6 +46,7 @@ export const graphSvg = (props: GraphArgs) => `
                 </h1>
             </foreignObject>
             ${props.line}
+            ${props.legend ?? ''}
     </svg>
 `;
 

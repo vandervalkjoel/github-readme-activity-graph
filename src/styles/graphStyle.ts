@@ -1,4 +1,18 @@
-export const graphStyle = (color: string, line: string, point: string, area: string) =>
+/**
+ * The whole block is inlined into every card, so it stays free of comments.
+ *
+ * `.ct-daily` is the one rule that needs explaining: those are the per-day bars.
+ * Butt caps keep a bar's height equal to its count instead of overshooting by
+ * half a stroke, which also means a zero day draws nothing at all. Their width
+ * is set inline per bar, because it depends on how many days are in the window.
+ */
+export const graphStyle = (
+    color: string,
+    line: string,
+    point: string,
+    area: string,
+    daily: string = line,
+) =>
     `
     .ct-label {
       fill: #${color};
@@ -102,8 +116,30 @@ export const graphStyle = (color: string, line: string, point: string, area: str
     }
 
     .ct-series-a .ct-area,
+    .ct-trend-series .ct-area,
     .ct-series-a .ct-slice-pie {
       fill: #${area};
+    }
+
+    .ct-daily,
+    .ct-legend-bar {
+      stroke: #${daily};
+      stroke-opacity: 0.6;
+      stroke-linecap: butt;
+      fill: none;
+      animation: blink 1s ease-in-out forwards;
+    }
+
+    .ct-legend-line {
+      stroke: #${line};
+      stroke-width: 4px;
+      stroke-linecap: round;
+    }
+
+    .ct-legend-label {
+      fill: #${color};
+      font: 600 13px 'Segoe UI', Ubuntu, Sans-Serif;
+      opacity: 0.85;
     }
 
     .ct-label .ct-horizontal {

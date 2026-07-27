@@ -37,6 +37,13 @@ export class Utilities {
             pointColor: this.queryString.point
                 ? this.queryString.point
                 : selectColors(theme).pointColor,
+            // The bars are the same measurement as the line, so they take the
+            // line's hue by default and separate themselves by weight instead.
+            dailyColor: this.queryString.daily_color
+                ? this.queryString.daily_color
+                : this.queryString.line
+                  ? this.queryString.line
+                  : selectColors(theme).lineColor,
         };
     }
 
@@ -100,8 +107,7 @@ export class Utilities {
         return days.map((day, i) => {
             const start = Math.max(0, i - window + 1);
             const slice = days.slice(start, i + 1);
-            const mean =
-                slice.reduce((sum, d) => sum + d.contributionCount, 0) / slice.length;
+            const mean = slice.reduce((sum, d) => sum + d.contributionCount, 0) / slice.length;
             return {
                 date: day.date,
                 contributionCount: Math.round(mean * 10) / 10,
@@ -189,6 +195,7 @@ export class Utilities {
             smooth: this.validateSmooth(this.queryString.smooth),
             show_point: String(this.queryString.hide_points) !== 'true',
             month_labels: String(this.queryString.x_axis) === 'month',
+            daily: String(this.queryString.daily) === 'true',
             from,
             to,
         };
@@ -224,9 +231,13 @@ export class Utilities {
                 options.grid,
                 options.show_point,
                 options.month_labels,
+                options.smooth,
             );
             const getChart = await graph.buildGraph(
                 Utilities.rollingAverage(fetchCalendarData.contributions, options.smooth),
+                // Smoothing is what hides the daily counts, so the bars only
+                // earn their ink once there is smoothing to see through.
+                options.daily && options.smooth > 1 ? fetchCalendarData.contributions : undefined,
             );
             return {
                 finalGraph: getChart,

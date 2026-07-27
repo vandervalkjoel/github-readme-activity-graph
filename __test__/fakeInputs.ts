@@ -98,7 +98,23 @@ export let fakeQueryString = [
     },
 ];
 
-export let fakeQueryStringRes = [
+/**
+ * Fill in the options none of these fixtures exercise, so a new option with a
+ * settled default does not mean editing every expectation below. The bars take
+ * the line's color unless daily_color says otherwise, which is asserted on its
+ * own rather than through these fixtures.
+ */
+const withDefaults = (results: any[]) =>
+    results.map((result) => ({
+        smooth: 1,
+        show_point: true,
+        month_labels: false,
+        daily: false,
+        ...result,
+        colors: { dailyColor: result.colors.lineColor, ...result.colors },
+    }));
+
+export let fakeQueryStringRes = withDefaults([
     {
         username: 'githubusername',
         radius: 8,
@@ -300,7 +316,7 @@ export let fakeQueryStringRes = [
         to: '',
         grid: true,
     },
-];
+]);
 
 export let fakeGraphArgs: GraphArgs = {
     height: 10,
