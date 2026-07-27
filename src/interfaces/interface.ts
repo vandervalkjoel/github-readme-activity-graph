@@ -29,6 +29,10 @@ export class QueryOption {
     days: number;
     /** Rolling-average window in days. 1 means no smoothing. */
     smooth: number;
+    /** Draw the dot on each data point. */
+    show_point: boolean;
+    /** Label the x axis by month instead of by day. */
+    month_labels: boolean;
 }
 
 export class ParsedQs {
@@ -52,6 +56,8 @@ export class ParsedQs {
     to?: string;
     grid?: string;
     smooth?: string;
+    hide_points?: string;
+    x_axis?: string;
 }
 
 export class GraphArgs {

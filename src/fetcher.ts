@@ -90,11 +90,16 @@ export class Fetcher {
                         apiResponse.data.data.user.contributionsCollection.contributionCalendar
                             .weeks;
                     // get day-contribution data
+                    // Keep the full ISO date. Upstream truncated it to the day of
+                    // the month here, which made month-level axis labels
+                    // impossible. The day-number label is now produced at render
+                    // time instead, so the default output is unchanged.
                     weeks.map((week: Week) =>
                         week.contributionDays.map((contributionDay: ContributionDay) => {
-                            contributionDay.date = moment(contributionDay.date, moment.ISO_8601)
-                                .date()
-                                .toString();
+                            contributionDay.date = moment(
+                                contributionDay.date,
+                                moment.ISO_8601,
+                            ).format('YYYY-MM-DD');
                             userData.contributions.push(contributionDay);
                         }),
                     );

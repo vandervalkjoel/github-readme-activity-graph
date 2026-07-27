@@ -164,6 +164,8 @@ export class Utilities {
             days: isFromValid && isToValid ? days : this.validateDays(this.queryString.days),
             grid: this.queryString.grid === 'false' ? false : true,
             smooth: this.validateSmooth(this.queryString.smooth),
+            show_point: String(this.queryString.hide_points) !== 'true',
+            month_labels: String(this.queryString.x_axis) === 'month',
             from,
             to,
         };
@@ -197,6 +199,8 @@ export class Utilities {
                 title,
                 options.area,
                 options.grid,
+                options.show_point,
+                options.month_labels,
             );
             const getChart = await graph.buildGraph(
                 Utilities.rollingAverage(fetchCalendarData.contributions, options.smooth),
