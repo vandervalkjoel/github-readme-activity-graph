@@ -58,6 +58,7 @@ export class ParsedQs {
     smooth?: string;
     hide_points?: string;
     x_axis?: string;
+    months?: string;
 }
 
 export class GraphArgs {

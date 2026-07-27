@@ -42,13 +42,29 @@ export class Utilities {
 
     private validateDays(days?: string): number {
         const d = Number(days);
-        if (typeof d !== 'number') {
-            return 31;
-        } else if (d > 0 && d <= 90) {
-            return d;
-        } else {
+        if (!Number.isFinite(d)) {
             return 31;
         }
+        // Upstream capped this at 90 and silently fell back to 31 above it,
+        // which made a year-long view impossible without from/to. Raised to 366
+        // so `months=12` has something to resolve to.
+        if (d > 0 && d <= 366) {
+            return Math.floor(d);
+        }
+        return 31;
+    }
+
+    /**
+     * Calendar months back from today, as a day count. Returns 0 when absent or
+     * out of range, meaning "fall back to the days parameter".
+     */
+    private validateMonths(months?: string): number {
+        const m = Number(months);
+        if (!Number.isFinite(m) || m < 1 || m > 12) {
+            return 0;
+        }
+        const to = moment();
+        return to.diff(to.clone().subtract(Math.floor(m), 'months'), 'days') + 1;
     }
 
     /**
@@ -136,6 +152,10 @@ export class Utilities {
         let from = '',
             to = '',
             days = 31;
+        const monthDays = this.validateMonths(this.queryString.months);
+        if (monthDays) {
+            days = monthDays;
+        }
         const isFromValid = this.validateDate(this.queryString.from);
         const isToValid = this.validateDate(this.queryString.to);
         if (isFromValid && isToValid) {
@@ -161,7 +181,10 @@ export class Utilities {
             height: this.queryString.height
                 ? Math.min(Math.max(this.queryString.height, 200), 600)
                 : 420, // Custom height implementation from range [200, 600], if not specified use default value - 420
-            days: isFromValid && isToValid ? days : this.validateDays(this.queryString.days),
+            days:
+                isFromValid && isToValid
+                    ? days
+                    : monthDays || this.validateDays(this.queryString.days),
             grid: this.queryString.grid === 'false' ? false : true,
             smooth: this.validateSmooth(this.queryString.smooth),
             show_point: String(this.queryString.hide_points) !== 'true',
